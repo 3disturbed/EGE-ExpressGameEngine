@@ -6,7 +6,7 @@ console.log(`EGE(${version}) - starting server...`);
 const http = require('http');
 const socketIO = require('socket.io');
 const { app } = require('./server-middleware');
-const { initializeSocket } = require('./server-sockets');
+const { initializeSocket } = require('./server-soockets');
 const { setupErrorHandling } = require('./server-error-handling');
 
 // Create HTTP server

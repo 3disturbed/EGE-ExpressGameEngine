@@ -23,7 +23,7 @@ Clone the repository:
 
 
 
-npm install compression connect-mongo express express-rate-limit express-session express-socket.io-session helmet mongoose socket.io --save
+npm install compression connect-mongo express express-rate-limit express-session express-socket.io-session helmet mongoose socket.io bcrypt --save
 
 
 Set up environment variables:
