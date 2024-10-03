@@ -22,6 +22,10 @@ Installation
 Clone the repository:
 
 
+
+npm install compression connect-mongo express express-rate-limit express-session express-socket.io-session helmet mongoose socket.io --save
+
+
 Set up environment variables:
 
 Create a .env file in the root directory and add the following variables:
