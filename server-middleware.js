@@ -18,17 +18,17 @@ console.log(`EGE(${version}) - setting up middleware...`);
 
 // Security middleware
 app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", 'example.com'],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", 'example.com', "'unsafe-eval'"], // Added 'unsafe-eval'
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
       },
-    },
-  })
-);
+    })
+  );
 
 // Rate Limiting
 const apiLimiter = rateLimit({

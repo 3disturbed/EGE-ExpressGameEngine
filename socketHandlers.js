@@ -30,7 +30,7 @@ function initializeSocket(io) {
       // Load the scene for the room
       const sceneName = roomName; // Assuming scene name matches room name
       try {
-        const gameObjects = getGameObjectsForClient(sceneName);
+        const gameObjects = getGameObjectsForClient(sceneName, io);
         socket.emit('initializeGameObjects', gameObjects);
       } catch (error) {
         console.error(error);
@@ -84,6 +84,3 @@ function initializeSocket(io) {
 }
 
 module.exports = { initializeSocket };
-
-  module.exports = { initializeSocket };
-  

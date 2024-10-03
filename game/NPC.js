@@ -1,4 +1,4 @@
-const GameObject = require('./GameObject');
+const GameObject = require('../GameObject');
 
 class NPC extends GameObject {
   constructor() {

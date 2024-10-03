@@ -36,3 +36,4 @@ class Enemy extends GameObject {
     
 
   }
+  module.exports = Enemy;

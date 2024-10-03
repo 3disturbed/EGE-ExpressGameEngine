@@ -32,3 +32,5 @@ class Player extends GameObject {
     
     
   }
+
+  module.exports = Player;
