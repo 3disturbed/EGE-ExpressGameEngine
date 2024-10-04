@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const GameObject = require('./GameObject');
 
 
 // Array to store replicated game objects
@@ -23,14 +24,23 @@ function broadcastReplicatedObjects(io) {
 
 function getGameObjectsForClient(sceneName, io) {
   // Load the scene file
+
+
+
+
   const scenePath = path.join(__dirname, 'scenes', `${sceneName}.js`);
   if (!fs.existsSync(scenePath)) {
     throw new Error(`Scene ${sceneName} does not exist.`);
   }
   const scene = require(scenePath);
 
+
+
   // Read the class files specified in the scene
   const gameObjects = scene.gameObjects.map((fileName) => {
+    // add GameObject.js to the list of game objects
+    
+  
     const classData = readClassFile(fileName);
     const name = path.basename(fileName, '.js'); // Extract class name
 

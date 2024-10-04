@@ -16,19 +16,18 @@ connectDB();
 
 console.log(`EGE(${version}) - setting up middleware...`);
 
-// Security middleware
 app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", 'example.com', "'unsafe-eval'"], // Added 'unsafe-eval'
-          objectSrc: ["'none'"],
-          upgradeInsecureRequests: [],
-        },
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-eval'", 'localhost', '127.0.0.1'], // Allow 'unsafe-eval' and localhost
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
       },
-    })
-  );
+    },
+  })
+);
 
 // Rate Limiting
 const apiLimiter = rateLimit({

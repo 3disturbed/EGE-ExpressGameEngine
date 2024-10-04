@@ -1,33 +1,57 @@
 
+
 // Array to store game objects
-const GameObjects = [];
+var GameObjects = [];
   // Initialize Socket.IO but prevent auto-connecting
 const socket = io({ autoConnect: false });
 // Object to store dynamically loaded classes
 const ClassRegistry = {};
-
-// Base GameObject class
+'use strict';
 class GameObject {
-  constructor() {
-    this.id = null;
-    this.isReplicated = false;
+    // This is a parent class for all game objects
+    // DO NOT MODIFY THIS CLASS DIRECTLY
+    // USE INHERITANCE TO CREATE NEW GAME OBJECTS
+    constructor() {
+      this.id = this.generateUniqueId();
+      this.isReplicated = false;
+      this.x = 0;
+      this.y = 0;
+      this.serialize();
+    }
+        // Simple utility function to generate a unique ID
+        generateUniqueId() {
+          return `obj_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+        }
+    OnLoad() {}
+    OnStart() {}
+    OnTick() {}
+    OnDraw(ctx) {}
+    OnUpdate() {}
+    OnEnd() {}
+    OnClose() {}
+    updateFromServer(data) {
+      this.isReplicated = data.isReplicated;
+      // Update properties based on data.type
+      if (data.position) {
+        this.x = data.position.x;
+        this.y = data.position.y;
+      }
+    }
+    
+    // Serialize object state for replication
+    serialize() {
+      return {
+        id: this.id,
+        type: this.constructor.name,
+        isReplicated: this.isReplicated,
+        x:this.x,
+        y:this.y,
+
+        // Include other relevant properties
+      };
+    }
   }
-
-  OnLoad() {}
-  OnStart() {}
-  OnTick() {}
-  OnDraw(ctx) {}
-  OnUpdate() {}
-  OnEnd() {}
-  OnClose() {}
-
-  // Update object state from server data
-  updateFromServer(data) {
-    this.id = data.id;
-    // Update other properties as needed
-  }
-}
-
+  
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -94,8 +118,8 @@ socket.on('initializeGameObjects', (gameObjectsData) => {
 
 // Handle replicated object updates
 socket.on('replicatedObjectUpdate', (objectsData) => {
-    objectsData.forEach((data) => {
-      let obj = GameObjects.find((o) => o.id === data.id);
+
+      let obj = GameObjects.find((o) => o.id === objectsData.id);
       if (!obj) {
         // Create new object
         const ClassConstructor = ClassRegistry[data.type];
@@ -111,10 +135,12 @@ socket.on('replicatedObjectUpdate', (objectsData) => {
         }
       } else {
         // Update existing object
-        obj.updateFromServer(data);
+        obj.updateFromServer(objectsData);
       }
-    });
+
   });
+
+
 // Handle signup
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -204,3 +230,17 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
  socket.on('chatMessage', (messageData) => {
    addChatMessage(messageData.message);
  });
+
+ // Game Loop Logic
+ setInterval(() => {
+    GameObjects.forEach((obj) => {
+      obj.OnTick();
+      obj.OnUpdate();
+      obj.OnDraw(ctx);
+
+      // send updates to the server for replicated objects
+      if (obj.isReplicated) {
+        socket.emit('replicatedObjectUpdate', obj.serialize());
+      }
+    });
+  }, 1000 / 60); // 60 times per second

@@ -1,6 +1,6 @@
 const { getGameObjectsForClient } = require('./gameObjectManager');
 const Client = require('./Client');
-
+var gameObjects = [];
 function initializeSocket(io) {
     io.on('connection', (socket) => {
       const userId = socket.handshake.session.userId;
@@ -30,7 +30,11 @@ function initializeSocket(io) {
       // Load the scene for the room
       const sceneName = roomName; // Assuming scene name matches room name
       try {
-        const gameObjects = getGameObjectsForClient(sceneName, io);
+        gameObjects = getGameObjectsForClient(sceneName, io);
+        console.log(`Sending game objects to client: ${gameObjects.length}`);
+        for (let i = 0; i < gameObjects.length; i++) {
+          console.log(gameObjects[i].name);
+        }
         socket.emit('initializeGameObjects', gameObjects);
       } catch (error) {
         console.error(error);
@@ -40,23 +44,25 @@ function initializeSocket(io) {
     //handle replicated object updates
 
     socket.on('replicatedObjectUpdate', (objectsData) => {
+     
+        if (!objectsData) {
+          console.error('No object data received.');
+          return;
+        } 
+        
         objectsData.forEach((data) => {
-          let obj = GameObjects.find((o) => o.id === data.id);
+          let obj = gameObjects.find((o) => o.id === data.id);
           if (!obj) {
-            // Create new object
-            const ClassConstructor = ClassRegistry[data.type];
-            if (ClassConstructor) {
-              obj = new ClassConstructor();
-              obj.updateFromServer(data);
-              obj.OnLoad();
-              GameObjects.push(obj);
-            } else {
-              console.error(`Class ${data.type} is not defined.`);
-              return;
-            }
+            // load class definition form ./game folder
+            const ClassConstructor = require(`./game/${data.id}`);
+            obj = new ClassConstructor();
+            gameObjects.push(obj);
+            console.log(`Creating new object: ${data.type}`);
           } else {
             // Update existing object
             obj.updateFromServer(data);
+            // send to all clients
+            io.emit('replicatedObjectUpdate', data);
           }
         });
       });
